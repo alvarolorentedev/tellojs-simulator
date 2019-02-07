@@ -6,19 +6,13 @@ jest.mock('dgram', () => ({
     createSocket: jest.fn()
 }))
 
+jest.mock('../src/state', () => ({
+    machine: jest.fn()
+}))
+
 const index = require('../src/index'),
+    state = require('../src/state'),
     dgram = require('dgram')
-
-
-// server.on('listening', function () {
-//     var address = server.address();
-//     console.log('UDP Server listening on ' + address.address + ":" + address.port);
-// });
-
-// server.on('message', function (message, remote) {
-//     console.log(remote.address + ':' + remote.port +' - ' + message);
-
-// });
 
 describe('simulator', () => {
     let commandSocket
@@ -54,16 +48,20 @@ describe('simulator', () => {
         
     });
 
-    it('should have a start function that binds a udp server to accept requests', () => {
+    it('should have a start function that binds udp server ports to accept requests', () => {
         index.start()
         expect(commandSocket.bind).toHaveBeenCalledWith("192.168.10.1", 8889)
-        expect(commandSocket.on).toHaveBeenCalledWith('message', expect.any(Function))
         expect(responseSocket.bind).toHaveBeenCalledWith("192.168.10.1", 8001)
         expect(stateSocket.bind).toHaveBeenCalledWith("192.168.10.1", 8890)
         expect(videoSocket.bind).toHaveBeenCalledWith("192.168.10.1", 11111)
     });
 
-    it('should have a stop function that closes udp server connection', () => {
+    it('should have a start function that bind event emitters and state manager', () => {
+        index.start()
+        expect(state.machine).toHaveBeenCalledWith(commandSocket,responseSocket,stateSocket,videoSocket)
+    });
+
+    it('should have a stop function that closes udp ports connection', () => {
         index.start()
         index.stop()
         expect(commandSocket.close).toHaveBeenCalled()

@@ -1,4 +1,5 @@
-const dgram = require('dgram')
+const dgram = require('dgram'),
+    state = require('./state')
 let commandSocket,
 responseSocket,
 stateSocket,
@@ -14,10 +15,10 @@ const initializeSockets = () => {
 const start = () => {
     initializeSockets()
     commandSocket.bind("192.168.10.1", 8889)
-    commandSocket.on('message', () => {})
     responseSocket.bind("192.168.10.1", 8001)
     stateSocket.bind("192.168.10.1", 8890)
     videoSocket.bind("192.168.10.1", 11111)
+    state.machine(commandSocket,responseSocket,stateSocket,videoSocket)
 }
 
 const stop = () => {
