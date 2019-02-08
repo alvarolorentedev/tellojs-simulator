@@ -37,14 +37,12 @@ const machine = (commandSocket,responseSocket,stateSocket,videoSocket) => {
     ],
     methods: {
       onEnterActuate: () => { 
-        responseSocket.emit('message', 'ok')
+        responseSocket.send("ok", 0, "ok".length, 8001)
         setTimeout(() => fsm.finish(), 0)
       }
     }
   });
-  commandSocket.on('message', (message) => {
-    fsm[message]()
-  })
+  commandSocket.on('message', (message) => fsm[message.toString('utf8')]())
   return fsm 
 }
 
