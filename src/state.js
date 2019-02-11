@@ -4,7 +4,7 @@ const machine = (commandSocket,responseSocket,stateSocket,videoSocket) => {
   const fsm = new StateMachine({
     init: 'uninitialized',
     transitions: [
-      { name: 'command', from: 'uninitialized', to: 'idle' },
+      { name: 'command', from: 'uninitialized', to: 'actuate' },
       { name: 'takeOff', from: 'idle', to: 'actuate' },
       { name: 'land', from: 'idle', to: 'actuate' },
       { name: 'emergency', from: 'idle', to: 'actuate' },
@@ -42,7 +42,7 @@ const machine = (commandSocket,responseSocket,stateSocket,videoSocket) => {
       }
     }
   });
-  commandSocket.on('message', (message) => fsm[message.toString('utf8')]())
+  commandSocket.on('message', message => fsm[message.toString('utf8')]())
   return fsm 
 }
 

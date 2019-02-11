@@ -3326,6 +3326,11 @@ tar@^4:
     safe-buffer "^5.1.2"
     yallist "^3.0.2"
 
+tellojs@^0.1.10:
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/tellojs/-/tellojs-0.1.10.tgz#55e48323afd0efaad4b88f6a430fd34dcb96b62e"
+  integrity sha512-LwAnHij5x76Fu6/cmLmz7rVGb/nzXg9VbqzltOMbW+oAQ+lK4uEIovNsiH2kiYAQYYwgW02AtI2rNUdVuEirAQ==
+
 test-exclude@^4.2.1:
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/test-exclude/-/test-exclude-4.2.3.tgz#a9a5e64474e4398339245a0a769ad7c2f4a97c20"
