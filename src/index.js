@@ -6,11 +6,11 @@ stateSocket,
 videoSocket
 
 const initializeSockets = () => {
-    commandSocket = dgram.createSocket({type: 'udp4', reuseAddr: true})
+    commandSocket = dgram.createSocket('udp4')
     commandSocket.bind({ port: 8889 })
-    responseSocket = dgram.createSocket({type: 'udp4', reuseAddr: true})
-    stateSocket = dgram.createSocket({type: 'udp4', reuseAddr: true})
-    videoSocket = dgram.createSocket({type: 'udp4', reuseAddr: true})
+    responseSocket = dgram.createSocket('udp4')
+    stateSocket = dgram.createSocket('udp4')
+    videoSocket = dgram.createSocket('udp4')
 }
 
 const start = () => {
@@ -20,9 +20,6 @@ const start = () => {
 
 const stop = () => {
     commandSocket.close()
-    responseSocket.close()
-    stateSocket.close()
-    videoSocket.close()
 }
 
 module.exports = { start, stop }

@@ -65,8 +65,5 @@ describe('simulator', () => {
         index.start()
         index.stop()
         expect(commandSocket.close).toHaveBeenCalled()
-        expect(responseSocket.close).toHaveBeenCalled()
-        expect(stateSocket.close).toHaveBeenCalled()
-        expect(videoSocket.close).toHaveBeenCalled()
     });
 });
