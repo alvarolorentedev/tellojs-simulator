@@ -1,8 +1,6 @@
 const index = require('../../src/index'),
-    sdk = require('tellojs'),
-    dgram = require('dgram')
+    sdk = require('tellojs')
 
-const waiter = () => new Promise((resolve) => setTimeout(resolve, 1000))
 describe('simulator', () => {
     it('should do stuff', async () => {
         index.start()

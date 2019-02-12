@@ -4,24 +4,46 @@ class TestEmitter extends EventEmitter {
 
 const machine = require('../../src/state').machine,
     faker = require('faker')
-const waiter = () => new Promise((resolve) => setTimeout(resolve, 0))
+const waiter = (time = 0) => new Promise((resolve) => setTimeout(resolve, time))
+const positionToString = (position) => {
+    const allProperties = Object.entries(position).reduce((accumulator, [property, value]) => `${accumulator}${property}:${value};`, "")
+    return `${allProperties}\r\n`
+}
 
 describe('state machine', () => {
     let commandSocket
     let responseSocket
     let stateSocket
     let videoSocket
+    let position
     
     beforeEach(() => {
+        position = {
+            pitch: 0, 
+            roll: 0, 
+            yaw: 0,
+            vgx:0,
+            vgy:0,
+            vgz:0,
+            templ:18,
+            temph:22,
+            tof:0,
+            h:0,
+            bat:100,
+            baro:0,
+            time:0,
+            agx:0,
+            agy:0,
+            agz:0
+          }
+
         commandSocket =new TestEmitter()
 
         responseSocket =new TestEmitter()
         responseSocket.send = jest.fn()
 
         stateSocket =new TestEmitter()
-        stateSocket.bind = jest.fn()
-        stateSocket.on = jest.fn()
-        stateSocket.close = jest.fn()
+        stateSocket.send = jest.fn()
 
         videoSocket =new TestEmitter()
         videoSocket.bind = jest.fn()
@@ -31,13 +53,24 @@ describe('state machine', () => {
     describe('control commands', () => {
 
     it('should idle to accept commands when received command input', async () => {
-        const local = machine(commandSocket,responseSocket,stateSocket, videoSocket)
+        const local = machine(commandSocket,responseSocket, stateSocket, videoSocket)
         commandSocket.emit('message', 'command')
+        await waiter();
         expect(local.is('idle')).toEqual(true)
     });
 
     it('when in idle should accept takeOff command', async () => {
         const local = await sendCommand('takeOff')
+        await waiter(1100);
+        const initialPosition = { ...position }
+        const initialPositionString = positionToString(initialPosition)
+        const intermediatePosition = { ...position, vgx: 20, h: 30, agx: 1 }
+        const intermediatePositionString = positionToString(intermediatePosition)
+        const finalPosition = { ...position, vgx: 0, h: 60, agx: 0 }
+        const finalPositionString = positionToString(finalPosition)
+        expect(stateSocket.send).toHaveBeenNthCalledWith(1, initialPositionString, 0, initialPositionString.length,8890)
+        expect(stateSocket.send).toHaveBeenNthCalledWith(2,intermediatePositionString, 0, intermediatePositionString.length,8890)
+        expect(stateSocket.send).toHaveBeenNthCalledWith(3,finalPositionString, 0, finalPositionString.length,8890)
         expect(responseSocket.send).toHaveBeenCalledWith("ok", 0, "ok".length, 8001)
         expect(local.is('idle')).toEqual(true)
     });
@@ -276,9 +309,10 @@ describe('state machine', () => {
 
 
     const sendCommand = async (...command) => {
-        let local = machine(commandSocket,responseSocket,stateSocket, videoSocket)
+        const local = machine(commandSocket,responseSocket,stateSocket, videoSocket)
         commandSocket.emit('message', 'command')
-        commandSocket.emit('message', ...command)
+        await waiter();
+        commandSocket.emit('message', command.join(' '))
         await waiter();
         return local
     }
