@@ -61,15 +61,16 @@ const machine = (commandSocket,responseSocket,stateSocket,videoSocket) => {
     ],
     methods: {
       onTakeOff: () =>  {
-        const initialPosition = { ...position }
-        const initialPositionString = positionToString(initialPosition)
-        const intermediatePosition = { ...position, vgx: 20, h: 30, agx: 1 }
-        const intermediatePositionString = positionToString(intermediatePosition)
-        const finalPosition = { ...position, vgx: 0, h: 60, agx: 0 }
-        const finalPositionString = positionToString(finalPosition)
-        setTimeout(() => stateSocket.send(initialPositionString, 0, initialPositionString.length, 8890), 0)
-        setTimeout(() => stateSocket.send(intermediatePositionString, 0, intermediatePositionString.length, 8890), 500)
-        setTimeout(() => stateSocket.send(finalPositionString, 0, finalPositionString.length, 8890), 900)
+        setTimeout(() => {
+          position.vgx += 20
+          position.h += 30
+          position.agx += 1
+        }, 500)
+        setTimeout(() => {
+          position.vgx = 0
+          position.h += 30
+          position.agx = 0
+        }, 900)
         setTimeout(() => fsm.finish(), 1000)
       },
       onEnterFinish: () => { 
@@ -78,6 +79,10 @@ const machine = (commandSocket,responseSocket,stateSocket,videoSocket) => {
       }
     }
   });
+  setInterval(() => {
+    const positionString = positionToString(position)
+    stateSocket.send(positionString, 0, positionString.length, 8890)
+  }, 200)
   commandSocket.on('message', message => {
     const command = message.toString('utf8').split(' ')
     return fsm[command[0]]()

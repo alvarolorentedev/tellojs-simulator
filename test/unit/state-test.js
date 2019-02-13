@@ -60,17 +60,19 @@ describe('state machine', () => {
     });
 
     it('when in idle should accept takeOff command', async () => {
-        const local = await sendCommand('takeOff')
-        await waiter(1100);
         const initialPosition = { ...position }
         const initialPositionString = positionToString(initialPosition)
         const intermediatePosition = { ...position, vgx: 20, h: 30, agx: 1 }
         const intermediatePositionString = positionToString(intermediatePosition)
         const finalPosition = { ...position, vgx: 0, h: 60, agx: 0 }
         const finalPositionString = positionToString(finalPosition)
-        expect(stateSocket.send).toHaveBeenNthCalledWith(1, initialPositionString, 0, initialPositionString.length,8890)
-        expect(stateSocket.send).toHaveBeenNthCalledWith(2,intermediatePositionString, 0, intermediatePositionString.length,8890)
-        expect(stateSocket.send).toHaveBeenNthCalledWith(3,finalPositionString, 0, finalPositionString.length,8890)
+
+        const local = await sendCommand('takeOff')
+        await waiter(1100);
+
+        expect(stateSocket.send).toHaveBeenCalledWith(initialPositionString, 0, initialPositionString.length,8890)
+        expect(stateSocket.send).toHaveBeenCalledWith(intermediatePositionString, 0, intermediatePositionString.length,8890)
+        expect(stateSocket.send).toHaveBeenCalledWith(finalPositionString, 0, finalPositionString.length,8890)
         expect(responseSocket.send).toHaveBeenCalledWith("ok", 0, "ok".length, 8001)
         expect(local.is('idle')).toEqual(true)
     });

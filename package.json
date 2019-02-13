@@ -4,9 +4,9 @@
   "description": "a simulator to develop applications for tello",
   "main": "src/index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest test/unit",
     "test:dev": "jest --watchAll test/unit",
-    "test:int": "jest test/integration",
+    "test:int": "jest test/integration --maxWorkers=1",
     "test:cov": "jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "push": "yarn test && git push",
     "deploy:major": "yarn version --major",
